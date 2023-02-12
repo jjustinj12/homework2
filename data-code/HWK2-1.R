@@ -60,14 +60,14 @@ final.hcris.data1 <-final.hcris.data %>%
   
 #5
 
-
-  
 data_2012 <-final.hcris.data1 %>%
+  replace_na(list(hvbp_payment = 0))%>%
+  replace_na(list(hrrp_payment = 0))%>%
   filter(year==2012) %>%
   mutate(penalty=hvbp_payment +hrrp_payment)
   
 z<- data_2012 %>%
-  filter(penalty > 0)
+  filter(penalty >= 0)
 non_penalty_avg_price <- mean(z$price, na.rm=TRUE)
 non_penalty_avg_price
 
@@ -79,8 +79,44 @@ penalty_avg_price <- mean(y$price, na.rm=TRUE)
 penalty_avg_price
 
 
+
+#6
+
+# Calculate the quartiles of the data set
+quartiles <- quantile(data_2012$beds, probs = c(0.25, 0.5, 0.75,1), na.rm=TRUE)
+
+q1 <- quartiles[1]
+q2 <- quartiles[2]
+q3 <- quartiles[3]
+q4<- quartiles[4]
+library(dplyr)
+library(tidyr)
+
+# Indicate which observations belong to which group
+data_with_groups <- data_2012 %>%
+  mutate(Q1 = ifelse(beds <= q1, 1, 0)) %>%
+  mutate(Q2 = ifelse(beds >q1 & beds <=q2, 1, 0)) %>%
+  mutate(Q3 = ifelse(beds >q2 & beds <=q3, 1, 0)) %>%
+  mutate(Q4 = ifelse(beds >q3 & beds <=q4, 1, 0)) 
+
+adam <- data_with_groups %>%
+  mutate(group = ifelse(penalty < 0, "Control", "Treatment")) %>%
+  group_by(group, Q1, Q2, Q3, Q4) %>%
+  select(penalty, Q1, Q2, Q3, Q4, price, group) %>%
+  summarize(mean_price=mean(price, na.rm = TRUE)) %>%
+  arrange(group, Q1, Q2, Q3, Q4))
+
+
+?arrange
+plan.type.year1 <-pivot_wider(adam, names_from="year", values_from= "n", names_prefix="")
+
   
+plan.type.year1 <- full.ma.data %>% 
+  group_by(plan_type, year) %>% 
+  count() %>% 
+  arrange(year, -n) %>% 
+  filter(plan_type!="NA")
 
+write.csv(plan.type.year1, file = "plan_type_year1.csv")
 
-
-
+  
