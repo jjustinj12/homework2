@@ -56,9 +56,7 @@ final.hcris.data1 <-final.hcris.data %>%
 
 
 
-ggplot(final.hcris.data1, aes(x = year, y = price, group=year)) +
-  geom_jitter(alpha= 0.05) +
-  geom_violin(alpha=.9)
+
 
 
 #I think this maybe an improved version of question 4 based on what I read on the power point 
@@ -183,7 +181,7 @@ select.dat <- select.dat %>%
 
 
 
-
+write_rds(final.hcris,'data/output/HCRIS_Data.rds')
 
 
 
