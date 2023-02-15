@@ -122,7 +122,6 @@ nn.est1 <- Matching::Match(Y=data_with_CT$price,
                            X=(data_with_CT %>% dplyr::select(Q1, Q2, Q3, Q4)),
                            M=1,
                            Weight=1,
-                           ties=FALSE,
                            estimand="ATE")
 
 summary(nn.est1)
@@ -135,7 +134,6 @@ nn.est2 <- Matching::Match(Y=data_with_CT$price,
                            X=(data_with_CT %>% dplyr::select(Q1, Q2, Q3, Q4)),
                            M=1,
                            Weight=2,
-                           ties=FALSE,
                            estimand="ATE")
 summary(nn.est2)
 
@@ -185,12 +183,8 @@ mean(pred1_alt-pred0_alt)
 
 
 
-
-x22 <- c(1, 2, 3)
-y22 <- c("a", "b", "c")
-z22 <- c(TRUE, FALSE, TRUE)
-
 # create a table of the output variables
+
 Estimate1 <- nn.est1$est
 Estimate2<-nn.est2$est
 Estimate3<-invisible(coef(reg.ipw)[2])
@@ -200,11 +194,10 @@ output_table <- data.frame("Nearest neighbor matching with inverse variance" = E
                            "Nearest neighbor matching with inverse variance"=Estimate2, 
                            "Inverse propensity weighting"=Estimate3,
                            "Simple Regression"= Estimate4)
-Estimate3
 
 
 
-
+kable(output_table)
 
 
 #8? 

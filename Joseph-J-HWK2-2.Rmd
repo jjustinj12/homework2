@@ -146,7 +146,6 @@ nn.est1 <- Matching::Match(Y=data_with_CT$price,
                            X=(data_with_CT %>% dplyr::select(Q1, Q2, Q3, Q4)),
                            M=1,
                            Weight=1,
-                           ties=FALSE,
                            estimand="ATE")
 
 summary(nn.est1)
@@ -159,7 +158,6 @@ nn.est2 <- Matching::Match(Y=data_with_CT$price,
                            X=(data_with_CT %>% dplyr::select(Q1, Q2, Q3, Q4)),
                            M=1,
                            Weight=2,
-                           ties=FALSE,
                            estimand="ATE")
 summary(nn.est2)
 
@@ -229,11 +227,10 @@ knitr::kable(output_table,
 ```
 
 ### 8
-All these different estimator provide a different estimate of the average treatment effect. My prediction for this is because they are using different frameworks in finding observations that are similar both between the control and treatment groups. 
+Yes all of my estimators are very similar however my regression seems to have an estimate of zero this may because these are two different samples I am trying to draw a line from. In addition, the reason we may have similar estimates is that all these estimators are doing the same thing in terms of matching between control and treatment observations and thus yielding similar results. . 
 
 ### 9
-I did not estimate a  causual because i was unable to correctly complete the ATE estimates
-but to actually answer this question yes because we are able to see the effect of the control and treatment groups on price by also having weights to better estimate the causal inference
+In my opinion yes i did estimate a causal inference. Given then i can't observe a counter factual world i did my best to match the control group to the treatment group by setting their bed size into quartiles that help match similar hospitals and then see the effect on price of whether or not they underwent a penalty. 
 
 ### 10
 honestly this homework was incredibly hard and frustrating. I think i spent at least 20 hours of straight coding or problem solving
