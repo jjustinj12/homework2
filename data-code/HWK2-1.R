@@ -143,12 +143,15 @@ results
 view(data_with_CT)
 
 #7
-nn.est1 <- Matching::Match(Y=data_with_CT$price,
-                           Tr=data_with_CT$group,
-                           X=data_with_CT$provider_number,
+nn.est1 <- Matching::Match(Y=Justin$price,
+                           Tr=Justin$penalty,
+                           X=Justin$beds,
                            M=1,
                            Weight=1,
+                           ties=FALSE,
                            estimand="ATE")
+
+summary(nn.est1)
 nn.est2 <- Matching::Match(Y=data_with_CT$price,
                            Tr=data_with_CT$group,
                            X=data_with_CT$provider_number,

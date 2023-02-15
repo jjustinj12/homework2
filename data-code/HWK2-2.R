@@ -1,6 +1,7 @@
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(tidyverse, ggplot2, dplyr, lubridate, stringr, readxl, data.table, 
                gdata, MatchIt, cobalt, Matching)
+library(knitr)
 
 #pulling the data in
 final.hcris.data=read_rds('data/output/HCRIS_Data.rds')
@@ -111,14 +112,14 @@ results<- data_with_CT %>%
   summarize(mean_price=mean(price, na.rm = TRUE))
 results 
 
-view(data_with_CT)
+
 
 #7
 
 
-nn.est1 <- Matching::Match(Y=Justin$price,
-                           Tr=Justin$penalty,
-                           X=Justin$beds,
+nn.est1 <- Matching::Match(Y=data_with_CT$price,
+                           Tr=data_with_CT$penalty,
+                           X=(data_with_CT %>% dplyr::select(Q1, Q2, Q3, Q4)),
                            M=1,
                            Weight=1,
                            ties=FALSE,
@@ -126,19 +127,84 @@ nn.est1 <- Matching::Match(Y=Justin$price,
 
 summary(nn.est1)
 
+
+
+
 nn.est2 <- Matching::Match(Y=data_with_CT$price,
-                           Tr=data_with_CT$group,
-                           X=data_with_CT$provider_number,
+                           Tr=data_with_CT$penalty,
+                           X=(data_with_CT %>% dplyr::select(Q1, Q2, Q3, Q4)),
                            M=1,
                            Weight=2,
+                           ties=FALSE,
                            estimand="ATE")
+summary(nn.est2)
 
-logit.reg <- glm(d_alt ~ x+z,
-                 data = data_with_CT, family = binomial(link = 'logit'))
-select.dat <- select.dat %>%
+
+##propensity score
+logit.reg <- glm(penalty ~ Q1+ Q2+ Q3 + Q4,
+                 data = data_with_CT, family = binomial)
+data_with_CT <- data_with_CT %>%
   mutate(ps = predict(logit.reg, type = 'response')) %>%
   filter(ps>0 & ps<1)
-#Honestly I spent about 8 hours trying to figure this part out and I was really struggling. I used every resource from in class code to online resources but still fell short. Hopefully time in class and group time will help rectify this problem. 
+
+
+# Create IPW weights
+data_with_CT <- data_with_CT %>%
+  mutate(ipw = case_when(
+    penalty == 1 ~ 1/ps,
+    penalty == 0 ~ 1/(1-ps),
+    TRUE~NA_real_
+  ))
+view(data_with_CT)
+
+mean.t1 <- data_with_CT %>% 
+  filter(penalty==1) %>% 
+  dplyr::select(price, ipw) %>%
+  summarize(mean_y=weighted.mean(price, w=ipw))
+mean.t0 <- data_with_CT %>% 
+  filter(penalty==0) %>% 
+  dplyr::select(price, ipw) %>%
+  summarize(mean_y=weighted.mean(price, w=ipw))
+mean.t1$mean_y - mean.t0$mean_y
+reg.ipw <- lm(price ~ penalty, data=data_with_CT, weights=ipw)
+
+
+
+
+## regression
+reg1.dat <- data_with_CT %>% filter(penalty==1)
+reg1 <- lm(price ~ Q1+ Q2+ Q3 + Q4, data=data_with_CT)
+
+reg0.dat <- data_with_CT %>% filter(penalty==0)
+reg0 <- lm(price ~ Q1+ Q2+ Q3 + Q4, data=data_with_CT)
+
+pred1_alt <- predict(reg1,new=data_with_CT)
+pred0_alt <- predict(reg0,new=data_with_CT)
+mean(pred1_alt-pred0_alt)
+
+
+
+
+
+x22 <- c(1, 2, 3)
+y22 <- c("a", "b", "c")
+z22 <- c(TRUE, FALSE, TRUE)
+
+# create a table of the output variables
+Estimate1 <- nn.est1$est
+Estimate2<-nn.est2$est
+Estimate3<-invisible(coef(reg.ipw)[2])
+Estimate4<-mean(pred1_alt-pred0_alt)
+
+output_table <- data.frame("Nearest neighbor matching with inverse variance" = Estimate1,
+                           "Nearest neighbor matching with inverse variance"=Estimate2, 
+                           "Inverse propensity weighting"=Estimate3,
+                           "Simple Regression"= Estimate4)
+Estimate3
+
+
+
+
 
 
 #8? 
