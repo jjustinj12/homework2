@@ -142,3 +142,6 @@ final.hcris.data =
   arrange(provider_number, year)
 
 write_rds(final.hcris.data,'data/output/HCRIS_Data.rds')
+
+
+write_rds(final.hcris,'data/output/HCRIS_Data_11.rds')
