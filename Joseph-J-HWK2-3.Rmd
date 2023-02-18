@@ -1,0 +1,75 @@
+---
+title: "Joseph-J-hwk2-3"
+author: "Justin Joseph"
+date: "2023-02-15"
+header-includes:
+  - \usepackage{booktabs}
+output:
+  bookdown::pdf_document2: 
+  fig_caption: yes
+  toc: false
+---
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(tidyverse, ggplot2, dplyr, lubridate, stringr, readxl, data.table, 
+               gdata, MatchIt, cobalt, Matching)
+library(knitr)
+```
+
+```{r, include=FALSE}
+load("Hwk2_workspace_3.Rdata")
+```
+
+### 1. Number of hospitals that filed more than one report in the same year
+```{r, echo=FALSE, fig.align='left'}
+figure1
+```
+\newpage
+
+### 2. Number of unique hospitals
+```{r, echo=FALSE}
+unique_hospitalIDS
+```
+After removing/combining multiple reports, there are `r format(unique_hospitalIDS, big.mark=",")` unique hospitals that exist in the data set
+\newpage
+
+### 3. Distribution of total charges
+```{r, echo=FALSE, warning=FALSE, fig.align='left'}
+figure3
+```
+\newpage
+
+### 4. Distribution of estimated prices in each year
+```{r, echo=FALSE, fig.align='left'}
+figure4
+```
+\newpage
+
+### 5.
+```{r, echo=FALSE}
+avg_price
+```
+\newpage
+
+### 6. 
+```{r, echo=FALSE}
+results
+```
+\newpage
+
+### 7. Find the average treatment effect using each of the following estimators
+```{r, echo=FALSE}
+kable(output_table, col.names = c("Inverse Variance", "Mahalanobis", "Inverse Propensity", "Simple Regression"))
+```
+\newpage
+
+### 8. 
+The first three models of the estimate of the average treatment effect using Inverse variance, mahalanobis and inverse propensity weighting are equivalent. However, simple regression provides different estimate because of the difference in comparison to matching vs a regression in modeling the effect of penalty on price. 
+
+
+### 9.
+Yes I believe I was able to estimate a causal inference. In the first three estimators we are doing are best to match the control group observations to the treatment observations so we can deduct to the best of our ability the effect being in the penalty group has on our price and limiting the confounding variable of bed size. Bigger bed size hospitals may just have larger prices or more penalties thus by matching based on bed size we are able to make a much stronger inference to the association between penalty and price. 
+
+### 10.
+So my experience at the end of this project is much better than when i started. When i began this journey with this module I was very lost concerning the material and understanding what the estimators were. However, after going to office hours I feel much more confident about them and could explain to a friend. In terms of the code, cleaning up the code was much easier for me and in the beginning I did have some trouble with the estimators but through group work I was able to find my mistakes. Lastly, I am doing much better at formatting by having my rmarkdown only call variables in stead of running whole lines of code which is awesome. 
+
