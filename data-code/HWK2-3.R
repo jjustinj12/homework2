@@ -5,6 +5,7 @@ library(knitr)
 
 #pulling the data in
 final.hcris.data=read_rds('data/output/HCRIS_Data.rds')
+final.hcris=read_rds('data/output/HCRIS_Data_11.rds')
 
 #1. How many hospitals filed more than one report in the same year
 
@@ -21,11 +22,11 @@ table1_df<-mutate(table1_df, countSum= table1_df$`2` + table1_df$`3`)
 table1_df<-rownames_to_column(table1_df, 'year')
 
 
-ggplot(table1_df, aes(x=year, y=countSum, group=1)) +
+figure1<-ggplot(table1_df, aes(x=year, y=countSum, group=1)) +
   geom_line() +
-  ggtitle("Number of Hospitals with more than one report ")+
+  ggtitle("Number of Hospitals with more than one report between 1997 and 2017 ")+
   xlab("Year") +
-  ylab("Number of hospitals with more than one report from 1996 to 2017") 
+  ylab("Number of hospitals with more than one report ") 
 
 
 
@@ -36,9 +37,9 @@ unique_hospitalIDS
 
 #3
 
-ggplot(final.hcris.data, aes(x = year, y = tot_charges, group=year)) +
+figure3<-ggplot(final.hcris.data, aes(x = year, y = tot_charges, group=year)) +
   geom_jitter(alpha= 0.05) +
-  labs(title = "Distribution of Total Charges in Each Year", x = "Year", y = "Total Charges")+
+  labs(title = "Distribution of Total Charges in Each Year between 1997 and 2017", x = "Year", y = "Total Charges")+
   geom_violin(alpha=.9)
 
 
@@ -63,30 +64,33 @@ Justin <- final.hcris.data1 %>% ungroup() %>%
           penalty = (hvbp_payment-hrrp_payment<0))  
 # Justin1<-Justin %>%
 #   filter(price<25000)
-ggplot(Justin, aes(x =as.factor(year), y = price)) +
+figure4<-ggplot(Justin, aes(x =as.factor(year), y = price)) +
   geom_jitter(alpha= 0.05) +
   labs(title = "Distribution of Estimated Prices Each Year", x = "Year", y = "Price")+
   geom_violin(alpha=.9)
 
 
 #5
-
-avg_price_penalty <- Justin %>%
-  filter(year==2012) %>%
-  filter(penalty==TRUE) %>%
-  summarise(penalty_price=mean(price))
-avg_price_penalty  
-avg_price_nopenalty <- Justin %>%
-  filter(year==2012) %>%
-  filter(penalty==FALSE) %>%
-  summarise(no_penalty_price=mean(price))
-avg_price_nopenalty  
+# 
+# avg_price_penalty <- Justin %>%
+#   filter(year==2012) %>%
+#   filter(penalty==TRUE) %>%
+#   summarise(penalty_price=mean(price))
+# avg_price_penalty  
+# avg_price_nopenalty <- Justin %>%
+#   filter(year==2012) %>%
+#   filter(penalty==FALSE) %>%
+#   summarise(no_penalty_price=mean(price))
+# avg_price_nopenalty  
 
 avg_price <- Justin %>%
   filter(year==2012) %>%
   group_by(penalty) %>%
   summarise(Average_Price=mean(price))
-avg_price
+avg_price<-data.frame(avg_price)
+avg_price<-kable(avg_price, caption = "The average price among penalized versus non-penalized hospitals")
+
+
 #6
 
 # Calculate the quartiles of the data set
@@ -114,9 +118,9 @@ data_with_CT<- data_with_groups %>%
 
 results<- data_with_CT %>%
   group_by(group, Q1, Q2, Q3, Q4) %>%
-  
   summarize(mean_price=mean(price, na.rm = TRUE))
-results 
+
+results<-kable(results, caption = "The average price among treated/control groups dependent among bed size stratafied by quartiles")
 
 
 
@@ -190,25 +194,35 @@ regression<-lm(price~penalty+Q1+Q2+Q3+Q4, data=data_with_CT)
 regression$coefficients["penaltyTRUE"]
 
 
+
 # create a table of the output variables
 
-Estimate1 <- nn.est1$est
-Estimate2<-nn.est2$est
-Estimate3<-invisible(coef(reg.ipw)[2])
-Estimate4<-regression$coefficients["penaltyTRUE"]
+# Estimate1 <- nn.est1$est
+# Estimate2<-nn.est2$est
+# Estimate3<-invisible(coef(reg.ipw)[2])
+# Estimate4<-regression$coefficients["penaltyTRUE"]
 
-output_table <- data.frame("Inverse variance" = nn.est1$est,
+output_table <- data.frame("Inverse_variance" = nn.est1$est,
                            "Mahalanobis"=nn.est2$est, 
-                           "Inverse propensity weighting"=reg.ipw$coefficients['penaltyTRUE'],
-                           "Simple Regression"= regression$coefficients["penaltyTRUE"])
+                           "Inverse_propensity_weighting"=reg.ipw$coefficients['penaltyTRUE'],
+                           "Simple_Regression"= regression$coefficients["penaltyTRUE"])
+rownames(output_table)[1]<-"Average Treatment Effect"
 
 kable(output_table)
 
+rm(list=c("data_2012", "data_with_CT",
+          "data_with_groups", "final.hcris", "final.hcris.data","final.hcris.data1","grouped_data",
+          "Justin", "logit.reg","mean.t0","mean.t1","nn.est1","filtered_data", "nn.est2",
+          "reg.ipw", "reg0", "reg0.dat", "reg1", "reg1.dat", "regression", "table1_df"))
 
-#8? 
-#VERY DIFFERENT 
+save.image("Hwk2_workspace_3.Rdata")
+
+#8
+#The first three models of the estimate of the average treatment effect usuing Inverse variance, mahalanobis and inverse prospensity weighting are equivalent. However, simple regression provides different estimate because of the difference in compairson to matching vs a regression in modeling the effect of penalty on price 
 #9
-#I did not estimate a causual inference because i was unable to correctly complete the ATE estimates 
+#Yes I believe I was able to estimate a causal inference 
+
+#I did not estimate a causal inference because i was unable to correctly complete the ATE estimates 
 #but to actually answer this question yes because we are able to see the effect of the control and treatment groups on price by also having weights to better estimate the causal inference
 #10 
 #honestly this homework was incredibly hard and frustrating. I think i spent at least 20 hours of straight coding or problem solving 
@@ -221,4 +235,4 @@ kable(output_table)
 
 
 
-#save.image("Hwk2_workspace_3.Rdata")
+
