@@ -171,16 +171,20 @@ reg.ipw <- lm(price ~ penalty, data=data_with_CT, weights=ipw)
 
 ## regression
 reg1.dat <- data_with_CT %>% filter(penalty==1)
-reg1 <- lm(price ~ Q1+ Q2+ Q3 + Q4, data=data_with_CT)
+reg1 <- lm(price ~ Q1+ Q2+ Q3 + Q4, data=reg1.dat)
 
 reg0.dat <- data_with_CT %>% filter(penalty==0)
-reg0 <- lm(price ~ Q1+ Q2+ Q3 + Q4, data=data_with_CT)
+reg0 <- lm(price ~ Q1+ Q2+ Q3 + Q4, data=reg0.dat)
 
 pred1_alt <- predict(reg1,new=data_with_CT)
 pred0_alt <- predict(reg0,new=data_with_CT)
 mean(pred1_alt-pred0_alt)
 
 
+## regression in a single step
+
+sam1<-lm(price~penalty+Q1+Q2+Q3+Q4, data=data_with_CT)
+sam1$coefficients
 
 
 # create a table of the output variables
