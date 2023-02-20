@@ -236,7 +236,7 @@ In my opinion yes i did estimate a causal inference. Given then i can't observe 
 honestly this homework was incredibly hard and frustrating. I think i spent at least 20 hours of straight coding or problem solving
 Also i feel very lost in terms of the new material we are covering in class which does not help when i need to apply this knowledge with real data in the homework
 one thing i did learn was i am getting better at cleaninig up the data and I believe I did good work until question 5 ish
-however one thing that still frustrates me is my inability to understanding the matching function and concepts we have learned in this module.
+however one thing that still frustrates me is my inability to understanding the matching function and concepts we have learned in this module
 
 
 
