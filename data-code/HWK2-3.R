@@ -121,7 +121,7 @@ results<- data_with_CT %>%
   summarize(mean_price=mean(price, na.rm = TRUE))
 
 results<-kable(results, caption = "The average price among treated/control groups dependent among bed size stratafied by quartiles")
-
+results
 
 
 #7
@@ -205,7 +205,7 @@ regression$coefficients["penaltyTRUE"]
 output_table <- data.frame("Inverse_variance" = nn.est1$est,
                            "Mahalanobis"=nn.est2$est, 
                            "Inverse_propensity_weighting"=reg.ipw$coefficients['penaltyTRUE'],
-                           "Simple_Regression"= regression$coefficients["penaltyTRUE"])
+                           "Simple_Regression"= mean(pred1_alt-pred0_alt))
 rownames(output_table)[1]<-"Average Treatment Effect"
 
 kable(output_table)
