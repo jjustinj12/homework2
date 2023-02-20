@@ -64,7 +64,7 @@ kable(output_table, col.names = c("Inverse Variance", "Mahalanobis", "Inverse Pr
 \newpage
 
 ### 8. 
-The first three models of the estimate of the average treatment effect using Inverse variance, mahalanobis, and inverse propensity weighting are equivalent. However, simple regression provides different estimate because of the difference in comparison to matching vs a regression in modeling the effect of penalty on price. The first three use in simple terms a weighing mechanism in order to control for bed size while simple regression does not have a specici weight for each observation and just controls for bed size. 
+The first three models of the estimate of the average treatment effect using Inverse variance, mahalanobis, and inverse propensity weighting are equivalent. However, simple regression provides different estimate because of the difference in comparison to matching vs a regression in modeling the effect of penalty on price. The first three use in simple terms a weighing mechanism/matching in order to control for bed size while simple regression does not have a special weight for each observation and just controls for bed size. 
 
 
 ### 9.
